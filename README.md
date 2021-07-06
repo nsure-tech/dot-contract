@@ -10,8 +10,10 @@ This is the mvp for nsure.
 ## Test
 Run `cargo +nightly test` to do testing.
 
+## License
+Nsure dot contracts and all other utilities are licensed under [Apache 2.0](LICENSE).
+
 ## Contact
 If you want any further information, feel free to contact us at **contact@nsure.network** :) ...
 
-## License
-Nsure dot contracts and all other utilities are licensed under [Apache 2.0](LICENSE).
+
