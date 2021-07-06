@@ -502,4 +502,100 @@ mod capital_converter {
             assert!(self.env().caller() == self.operator, "not operator");
         }
     }
+
+    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
+  /// module and test functions are marked with a `#[test]` attribute.
+  /// The below code is technically just normal Rust code.
+    #[cfg(test)]
+    mod tests {
+        /// Imports all the definitions from the outer scope so we can use them here.
+        use super::*;
+
+        /// Imports `ink_lang` so we can use `#[ink::test]`.
+        use ink_lang as ink;
+        use ink_env::AccountId;
+
+        #[ink::test]
+        fn mint_test() {
+            let mut capital_converter = CapitalConverter::new(
+                None,
+                None,
+                8,
+                AccountId::from([0x00; 32]),
+            );
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            assert_eq!(capital_converter.mint(accounts.alice, 1000), Ok(()));
+
+            assert_eq!(*capital_converter.total_supply, 1000);
+
+            assert_eq!(capital_converter.balance_of(accounts.alice), 1000);
+        }
+
+        #[ink::test]
+        fn burn_test() {
+            let mut capital_converter = CapitalConverter::new(
+                None,
+                None,
+                8,
+                AccountId::from([0x00; 32]),
+            );
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            assert_eq!(capital_converter.mint(accounts.alice, 1000), Ok(()));
+
+            assert_eq!(capital_converter.burn(accounts.alice, 200), Ok(()));
+
+            assert_eq!(capital_converter.balance_of(accounts.alice), 800);
+
+            assert_eq!(*capital_converter.total_supply, 800);
+        }
+
+        #[ink::test]
+        fn transfer_test() {
+            let mut capital_converter = CapitalConverter::new(
+                None,
+                None,
+                8,
+                AccountId::from([0x00; 32]),
+            );
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            assert_eq!(capital_converter.mint(accounts.alice, 1000), Ok(()));
+
+            assert_eq!(capital_converter.balance_of(accounts.bob), 0);
+
+            assert_eq!(capital_converter.transfer(accounts.bob, 100), Ok(()));
+
+            assert_eq!(capital_converter.balance_of(accounts.bob), 100);
+
+            assert_eq!(capital_converter.balance_of(accounts.alice), 900);
+        }
+
+        #[ink::test]
+        fn allowance_test() {
+            let mut capital_converter = CapitalConverter::new(
+                None,
+                None,
+                8,
+                AccountId::from([0x00; 32]),
+            );
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            assert_eq!(capital_converter.mint(accounts.alice, 1000), Ok(()));
+
+            assert_eq!(capital_converter.approve(accounts.bob, 100), Ok(()));
+
+            assert_eq!(capital_converter.allowance(accounts.alice, accounts.bob), 100);
+        }
+
+    }
 }

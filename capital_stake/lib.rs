@@ -246,13 +246,13 @@ mod capital_stake {
             let  reward = self.reward.get(&user).map(|i|*i).unwrap_or(0u128);
 
             let  pending_at_info = self.pending_at.get(&user).map(|i|*i).unwrap_or(0u64);
-            return (amount,reward_debt,pending_withdrawal_info,reward,pending_at_info)
+            return (amount,reward_debt,pending_withdrawal_info,reward,pending_at_info);
         }
 
         #[ink(message)]
         pub fn get_pool_info(&self,pid:u32) -> (Balance,AccountId,u128,u32,u128,u128) {
             let pool: &PoolInfo = self.pool_info.get(pid as usize).unwrap();
-            return (pool.amount,pool.lp_token,pool.alloc_point,pool.last_reward_block,pool.acc_nsure_per_share,pool.pending)
+            return (pool.amount,pool.lp_token,pool.alloc_point,pool.last_reward_block,pool.acc_nsure_per_share,pool.pending);
         }
 
         #[ink(message)]
@@ -699,6 +699,138 @@ mod capital_stake {
 
         fn only_operator(&self) {
             assert!(self.env().caller() == self.operator, "not operator");
+        }
+    }
+
+    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
+/// module and test functions are marked with a `#[test]` attribute.
+/// The below code is technically just normal Rust code.
+    #[cfg(test)]
+    mod tests {
+        /// Imports all the definitions from the outer scope so we can use them here.
+        use super::*;
+
+        /// Imports `ink_lang` so we can use `#[ink::test]`.
+        use ink_lang as ink;
+
+        /// We test if the default constructor does its job.
+        #[ink::test]
+        fn default_test() {
+            let mut capital_stake = CapitalStake::new(
+                AccountId::from([0x01; 32]),
+                AccountId::from([0x02; 32]),
+                1,
+            );
+
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+            capital_stake.owner = accounts.alice;
+            capital_stake.set_default();
+
+            assert_eq!(capital_stake.capacity_max.get(&0).copied().unwrap_or(0), 99999999999999);
+
+            assert_eq!(capital_stake.user_capacity_max.get(&0).copied().unwrap_or(0), 99999999999999);
+        }
+
+        #[ink::test]
+        fn switch_deposit_test() {
+            let mut capital_stake = CapitalStake::new(
+                AccountId::from([0x01; 32]),
+                AccountId::from([0x02; 32]),
+                1,
+            );
+
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+            capital_stake.owner = accounts.alice;
+
+            assert_eq!(capital_stake.can_deposit, true);
+
+            capital_stake.switch_deposit();
+
+            assert_eq!(capital_stake.can_deposit, false);
+        }
+
+        #[ink::test]
+        fn set_user_capacity_max_test() {
+            let mut capital_stake = CapitalStake::new(
+                AccountId::from([0x01; 32]),
+                AccountId::from([0x02; 32]),
+                1,
+            );
+
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            capital_stake.owner = accounts.alice;
+
+            capital_stake.set_user_capacity_max(0, 10000);
+
+            assert_eq!(capital_stake.user_capacity_max.get(&0).copied().unwrap_or(0), 10000);
+        }
+
+        #[ink::test]
+        fn set_capacity_max_test() {
+            let mut capital_stake = CapitalStake::new(
+                AccountId::from([0x01; 32]),
+                AccountId::from([0x02; 32]),
+                1,
+            );
+
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            capital_stake.owner = accounts.alice;
+
+            capital_stake.set_capacity_max(0, 10000);
+
+            assert_eq!(capital_stake.capacity_max.get(&0).copied().unwrap_or(0), 10000);
+        }
+
+        #[ink::test]
+        fn update_block_reward_test() {
+            let mut capital_stake = CapitalStake::new(
+                AccountId::from([0x01; 32]),
+                AccountId::from([0x02; 32]),
+                1,
+            );
+
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            capital_stake.owner = accounts.alice;
+
+            assert_eq!(capital_stake.nsure_per_block, 18 * 10u128.saturating_pow(10));
+
+            capital_stake.update_block_reward(12 * 10u128.saturating_pow(10));
+
+            assert_eq!(capital_stake.nsure_per_block, 12 * 10u128.saturating_pow(10));
+        }
+
+        #[ink::test]
+        fn update_withdraw_pending_test() {
+            let mut capital_stake = CapitalStake::new(
+                AccountId::from([0x01; 32]),
+                AccountId::from([0x02; 32]),
+                1,
+            );
+
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            capital_stake.owner = accounts.alice;
+
+            assert_eq!(capital_stake.pending_duration, 10);
+
+            capital_stake.update_withdraw_pending(20);
+
+            assert_eq!(capital_stake.pending_duration, 20);
         }
     }
 }

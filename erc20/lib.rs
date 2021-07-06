@@ -304,4 +304,80 @@ mod erc20 {
             assert_eq!(self.env().caller(), self.owner);
         }
     }
+
+    /// Unit tests in Rust are normally defined within such a `#[cfg(test)]`
+/// module and test functions are marked with a `#[test]` attribute.
+/// The below code is technically just normal Rust code.
+    #[cfg(test)]
+    mod tests {
+        /// Imports all the definitions from the outer scope so we can use them here.
+        use super::*;
+
+        /// Imports `ink_lang` so we can use `#[ink::test]`.
+        use ink_lang as ink;
+
+        #[ink::test]
+        fn new_test() {
+            let erc20 = Erc20::new(
+                100000,
+                None,
+                None,
+                Some(8),
+            );
+            assert_eq!(erc20.total_supply(), 100000);
+        }
+
+        #[ink::test]
+        fn balance_of_test() {
+            let erc20 = Erc20::new(
+                100000,
+                None,
+                None,
+                Some(8),
+            );
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+            assert_eq!(erc20.balance_of(accounts.alice), 100000);
+            assert_eq!(erc20.balance_of(accounts.bob), 0);
+        }
+
+        #[ink::test]
+        fn transfer_test() {
+            let mut erc20 = Erc20::new(
+                100000,
+                None,
+                None,
+                Some(8),
+            );
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            assert_eq!(erc20.balance_of(accounts.bob), 0);
+
+            assert_eq!(erc20.transfer(accounts.bob, 100), Ok(()));
+
+            assert_eq!(erc20.balance_of(accounts.bob), 100);
+
+            assert_eq!(erc20.balance_of(accounts.alice), 99900);
+        }
+
+        #[ink::test]
+        fn allowance_test() {
+            let mut erc20 = Erc20::new(
+                100000,
+                None,
+                None,
+                Some(8),
+            );
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            assert_eq!(erc20.approve(accounts.bob, 100), Ok(()));
+
+            assert_eq!(erc20.allowance(accounts.alice, accounts.bob), 100);
+        }
+    }
 }
