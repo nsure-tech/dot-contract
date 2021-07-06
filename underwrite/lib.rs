@@ -701,4 +701,34 @@ mod underwrite {
             assert!(self.env().caller() == self.operator, "not operator");
         }
     }
+
+
+    #[cfg(test)]
+    mod tests {
+        /// Imports all the definitions from the outer scope so we can use them here.
+        use super::*;
+
+        /// Imports `ink_lang` so we can use `#[ink::test]`.
+        use ink_lang as ink;
+
+        #[ink::test]
+        fn set_user_capacity_max_test() {
+            let mut underwrite = Underwrite::new(
+                AccountId::from([0x01; 32]),
+                AccountId::from([0x02; 32]),
+                1,
+            );
+
+            let accounts =
+                ink_env::test::default_accounts::<ink_env::DefaultEnvironment>()
+                    .expect("Cannot get accounts");
+
+            underwrite.owner = accounts.alice;
+
+            underwrite.set_user_capacity_max(0, 10000);
+
+            assert_eq!(underwrite.user_capacity_max.get(&0).copied().unwrap_or(0), 10000);
+        }
+      
+    }
 }
