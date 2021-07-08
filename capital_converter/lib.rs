@@ -1,3 +1,4 @@
+///capital_converter converts the dot token to ndot which is the token used to stake in Nsure's capital pool. Ndot reperesents your share when deposited into the capital pool. Rewards in Nsure will be distributed based on time weighted manner.
 #![cfg_attr(not(feature = "std"), no_std)]
 
 use ink_lang as ink;
