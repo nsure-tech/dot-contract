@@ -7,6 +7,14 @@ Nsure is an open insurance platform for Open Finance. The project borrows the id
 Support capital mining and underwriter deposit/withdraw.
 This is the mvp for nsure.
 
+capital_converter converts the dot token to ndot which is the token used to stake in Nsure's capital pool. Ndot reperesents your share when deposited into the capital pool. Rewards in Nsure will be distributed based on time weighted manner.
+
+erc20 is a smart contract similiar with erc20 token contract.
+
+capital_stake is the staking mining contract. Stake nDot to get reward in Nsure token.
+
+underwrite is the contract for Nsure token staking. Rewards can be adjusted.
+
 ## Test
 Run `cargo +nightly test` to do testing.
 
