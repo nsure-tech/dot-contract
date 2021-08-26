@@ -1,4 +1,5 @@
-# dot-contract
+# dot-contract ![web3 foundation_grants_badge_black](https://user-images.githubusercontent.com/29227055/130901154-0bad467c-6483-41d8-a361-60672d7faa63.jpg)
+
 
 ## Description 
 Nsure is an open insurance platform for Open Finance. The project borrows the idea of Lloyd’s London, a market place to trade insurance risks, where premiums are determined by a Dynamic Pricing Model. Capital mining will be implemented to secure capital required to back the risks at any point of time. A 3-phase crowd voting mechanism is used to ensure every claim is handled professionally. You can get all the information here: https://nsure.network/Nsure_WP_0.7.pdf
